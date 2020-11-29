@@ -35,15 +35,12 @@ import static com.cocoe.spring.user.constants.UserManagemnetConstants.*;
 
 @RestController
 @RequestMapping("/user")
-
+@PreAuthorize("hasAuthority('user:read')")
 public class UserController {
 
 	private static final String USER_DELETED_SUCCESSFULLY = "User deleted successfully";
 	@Autowired
 	UserDetailsService userService;
-
-
-
     @PostMapping("/update")
     public ResponseEntity<User> update(@RequestParam("currentEmail") String currentEmail,
                                        @RequestParam("firstName") String firstName,

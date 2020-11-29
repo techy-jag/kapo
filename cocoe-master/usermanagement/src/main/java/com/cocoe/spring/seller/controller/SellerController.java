@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,14 +37,16 @@ import static com.cocoe.spring.user.constants.UserManagemnetConstants.*;
 
 @RestController
 @RequestMapping("/seller")
-
+@PreAuthorize("hasAuthority('seller:read')")
 public class SellerController {
 
 	private static final String USER_DELETED_SUCCESSFULLY = "User deleted successfully";
 	@Autowired
 	UserDetailsService userService;
 
-
+	 public Authentication getAuthentication() {
+	        return SecurityContextHolder.getContext().getAuthentication();
+	    }
 
     @PostMapping("/update")
     public ResponseEntity<User> update(@RequestParam("currentEmail") String currentEmail,
@@ -64,6 +68,7 @@ public class SellerController {
     @GetMapping("/list")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getAllusers();
+       System.out.println( getAuthentication().getAuthorities());
         return new ResponseEntity<>(users, OK);
     }
 

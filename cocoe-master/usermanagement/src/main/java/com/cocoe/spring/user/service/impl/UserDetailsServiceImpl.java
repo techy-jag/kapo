@@ -63,8 +63,8 @@ public class UserDetailsServiceImpl
 		user.setPassword(encodePassword(password));
 		user.setIsActive(true);
 		user.setIsNotLocked(true);
-		user.setRole(new String[] { ROLE_USER.name() });
-		user.setAuthorities(ROLE_USER.getAuthorities());
+		user.setRole(new String[] { role});
+		user.setAuthorities(Role.valueOf(role).getAuthorities());
 		// user.setProfileImageUrl(getTemporaryProfileImageUrl(""));
 		userRepository.save(user);
 		return user;
