@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cocoe.spring.user.Role;
 import com.cocoe.spring.user.auth.jwt.JWTTokenProvider;
 import com.cocoe.spring.user.exception.EmailExistException;
 import com.cocoe.spring.user.exception.InvalidRoleException;
@@ -47,6 +48,7 @@ public class UserLoginController {
 	@PostMapping("/register")
 	public ResponseEntity<User> register(@RequestBody User user)
 			throws UserNotFoundException, UsernameExistException, EmailExistException, InvalidRoleException {
+		user.setRole(new String[] {Role.ROLE_USER.toString()});
 		User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getEmail(),
 				user.getPassword(), user.getRole()[0]);
 		return new ResponseEntity<>(newUser, OK);

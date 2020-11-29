@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cocoe.spring.admin.dao.AdminReposiatory;
 import com.cocoe.spring.ui.helper.UIControllerHelper;
 import com.cocoe.spring.user.exception.EmailExistException;
 import com.cocoe.spring.user.exception.EmailNotFoundException;
@@ -44,6 +45,8 @@ public class AdminController {
 	private UserDetailsService userService;
 	@Autowired
 	private UIControllerHelper uiControllerHelper;
+	@Autowired
+	private AdminReposiatory  adminReposiatory;
     @PostMapping("/update")
     public ResponseEntity<User> update(@RequestParam("currentEmail") String currentEmail,
                                        @RequestParam("firstName") String firstName,
@@ -71,6 +74,17 @@ public class AdminController {
         List<User> users = userService.getAllusers();
    System.out.println(uiControllerHelper.getAuthentication().getAuthorities());
          return new ResponseEntity<>(users, OK);
+    }
+    
+    @GetMapping("/allCustomer")
+    public ResponseEntity<List<User>> getAllCustomer() {
+        List<User> users = adminReposiatory.getAllUsers("ROLE_USER");
+        return new ResponseEntity<>(users, OK);
+    }
+    @GetMapping("/allSeller")
+    public ResponseEntity<List<User>> getAllSeller() {
+        List<User> users = adminReposiatory.getAllUsers("ROLE_SELLER");
+        return new ResponseEntity<>(users, OK);
     }
     
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
