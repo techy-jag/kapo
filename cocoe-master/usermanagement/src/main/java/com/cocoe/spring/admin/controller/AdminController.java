@@ -4,6 +4,7 @@ import static com.cocoe.spring.user.constants.UserManagemnetConstants.EMAIL_SENT
 import static org.springframework.http.HttpStatus.OK;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.mail.MessagingException;
@@ -33,6 +34,7 @@ import com.cocoe.spring.user.exception.UserNotFoundException;
 import com.cocoe.spring.user.exception.UsernameExistException;
 import com.cocoe.spring.user.model.HttpResponse;
 import com.cocoe.spring.user.model.User;
+import com.cocoe.spring.user.repository.RoleRepository;
 import com.cocoe.spring.user.service.UserDetailsService;
 
 @RestController
@@ -47,6 +49,8 @@ public class AdminController {
 	private UIControllerHelper uiControllerHelper;
 	@Autowired
 	private AdminReposiatory  adminReposiatory;
+	@Autowired
+	private RoleRepository roleRepository;
     @PostMapping("/update")
     public ResponseEntity<UserDTO> update(@RequestParam("currentEmail") String currentEmail,
                                        @RequestParam("firstName") String firstName,
@@ -77,12 +81,12 @@ public class AdminController {
     
     @GetMapping("/allCustomer")
     public ResponseEntity<List<UserDTO>> getAllCustomer() {
-        List<User> users = adminReposiatory.getAllUsers("ROLE_USER");
+        List<User> users = adminReposiatory.getAllUsers(Arrays.asList("ROLE_USER"));
     	return new ResponseEntity<>(UserToUserDTOMapper.convertAll(users), OK);
     }
     @GetMapping("/allSeller")
     public ResponseEntity<List<UserDTO>> getAllSeller() {
-        List<User> users = adminReposiatory.getAllUsers("ROLE_SELLER");
+        List<User> users = adminReposiatory.getAllUsers(Arrays.asList("ROLE_SELLER"));
         return new ResponseEntity<>(UserToUserDTOMapper.convertAll(users), OK);
     }
     
