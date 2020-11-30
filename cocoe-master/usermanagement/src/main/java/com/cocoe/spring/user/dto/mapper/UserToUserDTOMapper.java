@@ -1,5 +1,6 @@
 package com.cocoe.spring.user.dto.mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -9,6 +10,15 @@ import com.cocoe.spring.user.model.User;
 
 public class UserToUserDTOMapper {
 	
+	public static List<UserDTO> convertAll(List<User> users) {
+		List<UserDTO> usersDTO=new ArrayList<UserDTO>();
+		users.forEach(user->{
+			usersDTO.add(convert(user));
+		});
+		
+return usersDTO;
+	
+	}
 	
 public static UserDTO convert(User user) {
 	UserDTO userDTO=new UserDTO();

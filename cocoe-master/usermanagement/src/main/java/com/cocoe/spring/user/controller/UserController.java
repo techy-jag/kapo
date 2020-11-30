@@ -1,5 +1,6 @@
 package com.cocoe.spring.user.controller;
 
+import static com.cocoe.spring.user.constants.UserManagemnetConstants.EMAIL_SENT;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.io.IOException;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +19,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.cocoe.spring.user.dto.UserDTO;
+import com.cocoe.spring.user.dto.mapper.UserToUserDTOMapper;
 import com.cocoe.spring.user.exception.EmailExistException;
 import com.cocoe.spring.user.exception.EmailNotFoundException;
 import com.cocoe.spring.user.exception.InvalidRoleException;
@@ -31,37 +32,36 @@ import com.cocoe.spring.user.exception.UsernameExistException;
 import com.cocoe.spring.user.model.HttpResponse;
 import com.cocoe.spring.user.model.User;
 import com.cocoe.spring.user.service.UserDetailsService;
-import static com.cocoe.spring.user.constants.UserManagemnetConstants.*;
 
 @RestController
 @RequestMapping("/user")
-@PreAuthorize("hasAuthority('user:read')")
+@PreAuthorize("hasAuthority('USER')")
 public class UserController {
 
 	private static final String USER_DELETED_SUCCESSFULLY = "User deleted successfully";
 	@Autowired
 	UserDetailsService userService;
     @PostMapping("/update")
-    public ResponseEntity<User> update(@RequestParam("currentEmail") String currentEmail,
+    public ResponseEntity<UserDTO> update(@RequestParam("currentEmail") String currentEmail,
                                        @RequestParam("firstName") String firstName,
                                        @RequestParam("lastName") String lastName,                                      
                                        @RequestParam("email") String email,
                                        @RequestParam("role") String role
                                       ) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException, InvalidRoleException {
         User updatedUser = userService.updateUser(currentEmail, firstName, lastName,email, role);
-        return new ResponseEntity<>(updatedUser, OK);
+        return new ResponseEntity<>(UserToUserDTOMapper.convert(updatedUser), OK);
     }
     
     @GetMapping("/find/{username}")
-    public ResponseEntity<User> getUser(@PathVariable("email") String email) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable("email") String email) {
         User user = userService.getUserByEmail(email);
-        return new ResponseEntity<>(user, OK);
+        return new ResponseEntity<>(UserToUserDTOMapper.convert(user), OK);
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllusers();
-        return new ResponseEntity<>(users, OK);
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        List<User> users = userService.getAllusers();       
+        return new ResponseEntity<>(UserToUserDTOMapper.convertAll(users), OK);
     }
 
     @GetMapping("/resetpassword/{email}")

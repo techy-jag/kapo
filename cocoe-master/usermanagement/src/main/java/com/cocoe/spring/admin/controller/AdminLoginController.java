@@ -44,12 +44,12 @@ public class AdminLoginController {
 	private RoleService roleService;
 
 	@PostMapping("/login")
-	public ResponseEntity<User> login(@RequestBody User user) {
+	public ResponseEntity<UserDTO> login(@RequestBody User user) {
 		authenticate(user.getEmail(), user.getPassword());
 		User loginUser = userService.getUserByEmail(user.getEmail());
 		UserPrincipal userPrincipal = new UserPrincipal(loginUser);
 		HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
-		return new ResponseEntity<>(loginUser, jwtHeader, OK);
+		return new ResponseEntity<>(UserToUserDTOMapper.convert(loginUser), jwtHeader,OK);
 	}
 
 	@PostMapping("/register")
