@@ -3,25 +3,30 @@ package com.cocoe.spring.seller.controller;
 import static com.cocoe.spring.user.auth.jwt.constant.SecurityConstant.JWT_TOKEN_HEADER;
 import static org.springframework.http.HttpStatus.OK;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cocoe.spring.user.Role;
 import com.cocoe.spring.user.auth.jwt.JWTTokenProvider;
+import com.cocoe.spring.user.dto.UserDTO;
+import com.cocoe.spring.user.dto.mapper.UserToUserDTOMapper;
 import com.cocoe.spring.user.exception.EmailExistException;
 import com.cocoe.spring.user.exception.InvalidRoleException;
 import com.cocoe.spring.user.exception.UserNotFoundException;
 import com.cocoe.spring.user.exception.UsernameExistException;
+import com.cocoe.spring.user.model.Role;
 import com.cocoe.spring.user.model.User;
 import com.cocoe.spring.user.model.UserPrincipal;
+import com.cocoe.spring.user.service.RoleService;
 import com.cocoe.spring.user.service.UserDetailsService;
 
 @RestController
@@ -35,6 +40,8 @@ public class SellerLoginController {
 	private AuthenticationManager authenticationManager;
 	@Autowired
 	private JWTTokenProvider jwtTokenProvider;
+	@Autowired
+	private RoleService roleService;
 
 	@PostMapping("/login")
 	public ResponseEntity<User> login(@RequestBody User user) {
@@ -46,12 +53,12 @@ public class SellerLoginController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<User> register(@RequestBody User user)
+	public ResponseEntity<UserDTO> register(@RequestBody User user)
 			throws UserNotFoundException, UsernameExistException, EmailExistException, InvalidRoleException {
-		user.setRole(new String[] {Role.ROLE_SELLER.toString()});
+		Collection<Role> roles=Arrays.asList(roleService.getRoleByName("ROLE_SELLER"));
 		User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getEmail(),
-				user.getPassword(), user.getRole()[0]);
-		return new ResponseEntity<>(newUser, OK);
+				user.getPassword(), roles);
+		return new ResponseEntity<>(UserToUserDTOMapper.convert(newUser), OK);
 	}
 
 	private HttpHeaders getJwtHeader(UserPrincipal user) {

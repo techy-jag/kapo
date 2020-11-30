@@ -1,9 +1,11 @@
 package com.cocoe.spring.user.service.impl;
 
-import static com.cocoe.spring.user.Role.ROLE_USER;
 import static java.util.Arrays.stream;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,14 +24,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.cocoe.spring.user.Role;
 import com.cocoe.spring.user.exception.EmailExistException;
 import com.cocoe.spring.user.exception.EmailNotFoundException;
 import com.cocoe.spring.user.exception.InvalidRoleException;
 import com.cocoe.spring.user.exception.RecordNotFoundException;
 import com.cocoe.spring.user.exception.UserNotFoundException;
+import com.cocoe.spring.user.model.Role;
 import com.cocoe.spring.user.model.User;
 import com.cocoe.spring.user.model.UserPrincipal;
+import com.cocoe.spring.user.repository.RoleRepository;
 import com.cocoe.spring.user.repository.UserRepository;
 import com.cocoe.spring.user.service.EmailService;
 import com.cocoe.spring.user.service.LoginAttemptService;
@@ -49,12 +52,14 @@ public class UserDetailsServiceImpl
 	private LoginAttemptService loginAttemptService;
 	@Autowired
 	private EmailService emailService;
+	@Autowired
+	private RoleRepository roleRepository;
 
 	@Override
-	public User register(String firstName, String lastName, String email, String password,String role)
+	public User register(String firstName, String lastName, String email, String password,Collection<Role> roles)
 			throws UserNotFoundException, EmailExistException, InvalidRoleException {
 
-		validateNewUserEmailWithRole(email,role);
+		validateNewUserEmailWithRole(email,roles);
 		User user = new User();
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
@@ -62,9 +67,8 @@ public class UserDetailsServiceImpl
 		user.setJoinDate(new Date());
 		user.setPassword(encodePassword(password));
 		user.setIsActive(true);
-		user.setIsNotLocked(true);
-		user.setRole(new String[] { role});
-		user.setAuthorities(Role.valueOf(role).getAuthorities());
+		user.setIsNotLocked(true);		
+		user.setRoles( roles);		
 		// user.setProfileImageUrl(getTemporaryProfileImageUrl(""));
 		userRepository.save(user);
 		return user;
@@ -132,9 +136,8 @@ public class UserDetailsServiceImpl
 		    User currentUser = validateEmailWithRole(currentEmail,  email,role);
 	        currentUser.setFirstName(firstName);
 	        currentUser.setLastName(lastName);	     
-	        currentUser.setEmail(email);
-	        currentUser.setRole(new String[] {getRoleEnumName(role).name()});
-	        currentUser.setAuthorities(getRoleEnumName(role).getAuthorities());
+	        currentUser.setEmail(email);	        
+	        currentUser.setRoles(Arrays.asList(roleRepository.findByName(role)));   	
 	        userRepository.save(currentUser);	        
 	        return currentUser;
 	}
@@ -164,9 +167,8 @@ public class UserDetailsServiceImpl
 			loginAttemptService.evictUserFromLoginAttemptCache(user.getEmail());
 		}
 	}
-	private void validateNewUserEmailWithRole(String email,String role) throws EmailExistException, InvalidRoleException {
-		getRoleEnumName(role);
-		if (Objects.nonNull(getUserByEmail(email))) {
+	private void validateNewUserEmailWithRole(String email,Collection<Role> role) throws EmailExistException, InvalidRoleException {
+			if (Objects.nonNull(getUserByEmail(email))) {
 			throw new EmailExistException("Email already in use");
 		}
 	}
@@ -175,7 +177,7 @@ public class UserDetailsServiceImpl
 		return passwordEncoder.encode(password);
 	}
 	private User validateEmailWithRole(String currentEmail, String email,String role) throws EmailExistException, UserNotFoundException, InvalidRoleException {
-		getRoleEnumName(role);
+	
 		User user=getUserByEmail(currentEmail);
 		if (Objects.isNull(user)) {
 			throw new UserNotFoundException("Please send correct user email to updatae ueser");
@@ -186,14 +188,7 @@ public class UserDetailsServiceImpl
 		return user;
 	}
 	
-	 private Role getRoleEnumName(String role) throws InvalidRoleException {
-		    try {
-	        return Role.valueOf(role.toUpperCase());
-		    }catch (IllegalArgumentException e) {
-				throw new InvalidRoleException("Excpected value for Roles "+ 
-		   String.join(",", stream(Role.values()).map(a->a.name()).collect(Collectors.toList())));
-			}
-	    }
+	
 
 
 	

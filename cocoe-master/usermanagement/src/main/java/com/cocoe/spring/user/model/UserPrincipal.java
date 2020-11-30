@@ -1,7 +1,8 @@
 package com.cocoe.spring.user.model;
 
-import static java.util.Arrays.stream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -29,8 +30,8 @@ public class UserPrincipal implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		
-		return stream(this.user
-				.getAuthorities()).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+		return getAuthorities(this.user.getRoles());
+			
 	}
 
 	@Override
@@ -67,5 +68,32 @@ public class UserPrincipal implements UserDetails {
 		
 		return this.user.getIsActive();
 	}
+	
+	  private Collection<? extends GrantedAuthority> getAuthorities(
+		      Collection<Role> roles) {
+		 
+		        return getGrantedAuthorities(getPrivileges(roles));
+		    }
+		 
+		    private List<String> getPrivileges(Collection<Role> roles) {
+		 
+		        List<String> privileges = new ArrayList<>();
+		        List<Privilege> collection = new ArrayList<>();
+		        for (Role role : roles) {
+		            collection.addAll(role.getPrivileges());
+		        }
+		        for (Privilege item : collection) {
+		            privileges.add(item.getName());
+		        }
+		        return privileges;
+		    }
+		 
+		    private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
+		        List<GrantedAuthority> authorities = new ArrayList<>();
+		        for (String privilege : privileges) {
+		            authorities.add(new SimpleGrantedAuthority(privilege));
+		        }
+		        return authorities;
+		    }
 
 }
