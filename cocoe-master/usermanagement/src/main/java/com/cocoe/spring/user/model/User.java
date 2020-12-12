@@ -3,6 +3,7 @@ package com.cocoe.spring.user.model;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -15,7 +16,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
@@ -50,6 +50,9 @@ public class User implements Serializable {
 	private Collection<Role> roles;
 	private Boolean isActive;
 	private Boolean isNotLocked;
+//  private List<Integer> addressId;  
+  private Address profileAdress;
+  private List<Address> address;
 
 	public Date getLastLoginDateDisplay() {
 		return lastLoginDateDisplay;
