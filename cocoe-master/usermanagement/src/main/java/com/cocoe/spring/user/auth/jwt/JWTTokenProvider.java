@@ -1,7 +1,11 @@
 package com.cocoe.spring.user.auth.jwt;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
-import static com.cocoe.spring.user.auth.jwt.constant.SecurityConstant.*;
+import static com.cocoe.spring.user.auth.jwt.constant.SecurityConstant.AUTHORITIES;
+import static com.cocoe.spring.user.auth.jwt.constant.SecurityConstant.COCOE_ORG;
+import static com.cocoe.spring.user.auth.jwt.constant.SecurityConstant.EXPIRATION_TIME;
+import static com.cocoe.spring.user.auth.jwt.constant.SecurityConstant.TOKEN_CANNOT_BE_VERIFIED;
+import static com.cocoe.spring.user.auth.jwt.constant.SecurityConstant.USERMANAGEMENT;
 import static java.util.Arrays.stream;
 
 import java.util.ArrayList;
@@ -12,6 +16,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,10 +30,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.cocoe.spring.user.model.UserPrincipal;
+import com.cocoe.spring.user.service.UserDetailsService;
 @Component
 public class JWTTokenProvider {
 	  @Value("${jwt.secret}")
 	    private String secret;
+	  @Autowired
+	  private UserDetailsService userDetailsService;
 
 	    public String generateJwtToken(UserPrincipal userPrincipal) {
 	        String[] claims = getClaimsFromUser(userPrincipal);
@@ -45,8 +53,9 @@ public class JWTTokenProvider {
 
 	    public Authentication getAuthentication(String username, List<GrantedAuthority> authorities, HttpServletRequest request) {
 	        UsernamePasswordAuthenticationToken userPasswordAuthToken = new
-	                UsernamePasswordAuthenticationToken(username, null, authorities);
+	                UsernamePasswordAuthenticationToken(userDetailsService.getUserByEmail(username), null, authorities);
 	        userPasswordAuthToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+	        
 	        return userPasswordAuthToken;
 	    }
 

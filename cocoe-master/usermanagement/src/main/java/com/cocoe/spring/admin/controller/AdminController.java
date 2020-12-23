@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,9 +33,11 @@ import com.cocoe.spring.user.exception.NotAnImageFileException;
 import com.cocoe.spring.user.exception.RecordNotFoundException;
 import com.cocoe.spring.user.exception.UserNotFoundException;
 import com.cocoe.spring.user.exception.UsernameExistException;
+import com.cocoe.spring.user.model.Address;
 import com.cocoe.spring.user.model.HttpResponse;
 import com.cocoe.spring.user.model.User;
 import com.cocoe.spring.user.repository.RoleRepository;
+import com.cocoe.spring.user.service.UserAccountDetailsService;
 import com.cocoe.spring.user.service.UserDetailsService;
 
 @RestController
@@ -45,12 +48,11 @@ public class AdminController {
 	private static final String USER_DELETED_SUCCESSFULLY = "User deleted successfully";
 	@Autowired
 	private UserDetailsService userService;
-	@Autowired
-	private UIControllerHelper uiControllerHelper;
+
 	@Autowired
 	private AdminReposiatory  adminReposiatory;
-	@Autowired
-	private RoleRepository roleRepository;
+
+	
     @PostMapping("/update")
     public ResponseEntity<UserDTO> update(@RequestParam("currentEmail") String currentEmail,
                                        @RequestParam("firstName") String firstName,
@@ -89,6 +91,14 @@ public class AdminController {
         List<User> users = adminReposiatory.getAllUsers(Arrays.asList("ROLE_SELLER"));
         return new ResponseEntity<>(UserToUserDTOMapper.convertAll(users), OK);
     }
+    
+    
+    @GetMapping("/current")
+    public ResponseEntity<List<UserDTO>> getCurrent() {     ;
+        return new ResponseEntity<>(OK);
+    }
+
+    
     
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(),

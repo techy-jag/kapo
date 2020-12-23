@@ -1,15 +1,11 @@
 package com.cocoe.spring.user.service.impl;
 
-import static java.util.Arrays.stream;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
@@ -19,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,6 +31,7 @@ import com.cocoe.spring.user.model.User;
 import com.cocoe.spring.user.model.UserPrincipal;
 import com.cocoe.spring.user.repository.RoleRepository;
 import com.cocoe.spring.user.repository.UserRepository;
+import com.cocoe.spring.user.repository.dao.UserAccountDetailsDAO;
 import com.cocoe.spring.user.service.EmailService;
 import com.cocoe.spring.user.service.LoginAttemptService;
 import com.cocoe.spring.user.service.UserDetailsService;
@@ -54,6 +52,7 @@ public class UserDetailsServiceImpl
 	private EmailService emailService;
 	@Autowired
 	private RoleRepository roleRepository;
+
 
 	@Override
 	public User register(String firstName, String lastName, String email, String password,Collection<Role> roles)
@@ -186,6 +185,14 @@ public class UserDetailsServiceImpl
 			throw new EmailExistException("Email already in use");
 		}
 		return user;
+	}
+
+
+	@Override
+	public User  getCurrentUser() {
+		return (User)SecurityContextHolder.getContext().
+			getAuthentication().getPrincipal();
+		
 	}
 	
 	

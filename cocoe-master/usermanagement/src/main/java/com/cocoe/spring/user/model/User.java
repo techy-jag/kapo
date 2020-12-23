@@ -13,9 +13,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
@@ -50,6 +51,10 @@ public class User implements Serializable {
 	private Collection<Role> roles;
 	private Boolean isActive;
 	private Boolean isNotLocked;
+	@OneToOne
+	private Address profileAddress;
+	@OneToMany(mappedBy = "user")	
+	private Set<Address> addresses;
 
 	public Date getLastLoginDateDisplay() {
 		return lastLoginDateDisplay;
@@ -185,6 +190,24 @@ public class User implements Serializable {
 		this.roles = roles;
 	}
 
-	// Setters and getters
+	public Address getProfileAddress() {
+		return profileAddress;
+	}
 
+	public void setProfileAddress(Address profileAddress) {
+		this.profileAddress = profileAddress;
+	}
+
+	public Set<Address> getAddresses() {
+		return addresses;
+	}
+
+	public void addAddresses(Address address) {
+		this.addresses .add(address);
+	}
+	public void removeAddresses(Address address) {
+		this.addresses .remove(address);
+	}
+
+	
 }

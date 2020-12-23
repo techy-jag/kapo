@@ -25,8 +25,6 @@ public class SetupDataLoader implements
  
     boolean alreadySetup = false;
  
-    @Autowired
-    private UserRepository userRepository;
  
     @Autowired
     private RoleRepository roleRepository;

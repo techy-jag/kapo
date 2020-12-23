@@ -25,6 +25,6 @@ public interface UserDetailsService {
 			String role) throws EmailExistException, UserNotFoundException, InvalidRoleException;
 	void resetPassword(String email) throws EmailNotFoundException, MessagingException;
 	
-	
+	User getCurrentUser();
 
 }

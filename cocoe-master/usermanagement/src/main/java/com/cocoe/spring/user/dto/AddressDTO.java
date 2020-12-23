@@ -1,16 +1,6 @@
-package com.cocoe.spring.user.model;
+package com.cocoe.spring.user.dto;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-
-import com.cocoe.spring.user.AddressType;
-
-@Entity
-public class Address {
-	@Id
-	@GeneratedValue
+public class AddressDTO {
 	private Long id;
 	private String firstName;
 	private String lastName;
@@ -18,24 +8,10 @@ public class Address {
 	private String line2;
 	private String landmark;
 	private String city;
-	private String State;
+	private String state;
 	private String country;
 	private boolean deliveryAddress;
 	private boolean billingAddress;
-	public boolean isDeliveryAddress() {
-		return deliveryAddress;
-	}
-	public void setDeliveryAddress(boolean deliveryAddress) {
-		this.deliveryAddress = deliveryAddress;
-	}
-	public boolean isBillingAddress() {
-		return billingAddress;
-	}
-	public void setBillingAddress(boolean billingAddress) {
-		this.billingAddress = billingAddress;
-	}
-	@ManyToOne
-	private User user;
 	public Long getId() {
 		return id;
 	}
@@ -79,10 +55,10 @@ public class Address {
 		this.city = city;
 	}
 	public String getState() {
-		return State;
+		return state;
 	}
 	public void setState(String state) {
-		State = state;
+		this.state = state;
 	}
 	public String getCountry() {
 		return country;
@@ -90,14 +66,16 @@ public class Address {
 	public void setCountry(String country) {
 		this.country = country;
 	}
-	public User getUser() {
-		return user;
+	public boolean isDeliveryAddress() {
+		return deliveryAddress;
 	}
-	public void setUser(User user) {
-		this.user = user;
+	public void setDeliveryAddress(boolean deliveryAddress) {
+		this.deliveryAddress = deliveryAddress;
 	}
-
-	
-	
-
+	public boolean isBillingAddress() {
+		return billingAddress;
+	}
+	public void setBillingAddress(boolean billingAddress) {
+		this.billingAddress = billingAddress;
+	}
 }
