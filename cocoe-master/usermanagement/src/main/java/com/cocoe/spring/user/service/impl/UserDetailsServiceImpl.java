@@ -27,6 +27,7 @@ import com.cocoe.spring.user.exception.InvalidRoleException;
 import com.cocoe.spring.user.exception.RecordNotFoundException;
 import com.cocoe.spring.user.exception.UserNotFoundException;
 import com.cocoe.spring.user.model.Role;
+import com.cocoe.spring.user.model.Seller;
 import com.cocoe.spring.user.model.User;
 import com.cocoe.spring.user.model.UserPrincipal;
 import com.cocoe.spring.user.repository.RoleRepository;
@@ -55,10 +56,11 @@ public class UserDetailsServiceImpl
 
 
 	@Override
-	public User register(String firstName, String lastName, String email, String password,Collection<Role> roles)
+	public User register(String firstName, 
+			String lastName, String email, String password,Collection<Role> roles)
 			throws UserNotFoundException, EmailExistException, InvalidRoleException {
-
 		validateNewUserEmailWithRole(email,roles);
+	
 		User user = new User();
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
@@ -69,11 +71,24 @@ public class UserDetailsServiceImpl
 		user.setIsNotLocked(true);		
 		user.setRoles( roles);		
 		// user.setProfileImageUrl(getTemporaryProfileImageUrl(""));
-		userRepository.save(user);
+	
+		if(roles.stream().anyMatch(role->"ROLE_SELLER".equals(role.getName()))) {
+			registerSeller(user);
+		}else {
+			userRepository.save(user);
+		}
+	
 		return user;
 	}
 
 	
+	private void registerSeller(User user) {
+		Seller seller=new Seller(user);
+		userRepository.save(seller);
+		
+	}
+
+
 	@Override
 	public List<User> getAllusers() {
 

@@ -6,11 +6,13 @@ import static org.springframework.http.HttpStatus.OK;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.hibernate.hql.internal.CollectionSubqueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,7 @@ import com.cocoe.spring.user.exception.InvalidRoleException;
 import com.cocoe.spring.user.exception.UserNotFoundException;
 import com.cocoe.spring.user.exception.UsernameExistException;
 import com.cocoe.spring.user.model.Role;
+import com.cocoe.spring.user.model.Seller;
 import com.cocoe.spring.user.model.User;
 import com.cocoe.spring.user.model.UserPrincipal;
 import com.cocoe.spring.user.service.RoleService;
@@ -46,9 +49,13 @@ public class SellerLoginController {
 	@PostMapping("/login")
 	public ResponseEntity<UserDTO> login(@RequestBody User user) {
 		authenticate(user.getEmail(), user.getPassword());
-		User loginUser = userService.getUserByEmail(user.getEmail());
+		Seller loginUser = (Seller)userService.getUserByEmail(user.getEmail());		
 		UserPrincipal userPrincipal = new UserPrincipal(loginUser);
 		HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
+		
+		if(CollectionUtils.isEmpty(loginUser.getShopDetails())) {
+			System.out.println("Add at leats One Shop");
+		}
 		return new ResponseEntity<>(UserToUserDTOMapper.convert(loginUser), jwtHeader,OK);
 	}
 

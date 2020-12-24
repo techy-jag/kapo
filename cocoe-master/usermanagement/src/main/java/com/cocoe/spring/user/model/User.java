@@ -10,6 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -21,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "Users")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User implements Serializable {
 
 	/**
@@ -153,7 +156,7 @@ public class User implements Serializable {
 	}
 
 	public User(Long id, String firstName, String lastName, String email, String profileImageUrl,
-			Date lastLoginDateDisplay, Date lastLoginDate, Date joinDate, Set<Role> role, Set<String> authorities,
+			Date lastLoginDateDisplay, Date lastLoginDate, Date joinDate, Collection<Role> role, String password,
 			Boolean isActive, Boolean isLocked) {
 		super();
 		this.id = id;
@@ -164,7 +167,7 @@ public class User implements Serializable {
 		this.lastLoginDate = lastLoginDate;
 		this.joinDate = joinDate;
 		this.roles = role;
-
+       this.password=password;
 		this.isActive = isActive;
 		this.isNotLocked = isLocked;
 		this.lastLoginDateDisplay = lastLoginDateDisplay;

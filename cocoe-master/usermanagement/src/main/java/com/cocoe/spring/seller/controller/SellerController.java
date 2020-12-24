@@ -18,10 +18,15 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cocoe.spring.seller.dto.ShopDetailsDTO;
+import com.cocoe.spring.seller.dto.mapper.ShopDetailsDTOToShopDetailsMapper;
+import com.cocoe.spring.seller.dto.mapper.ShopDetailsToShopDetailsDTOMapper;
+import com.cocoe.spring.seller.service.ShopDetailsService;
 import com.cocoe.spring.user.dto.UserDTO;
 import com.cocoe.spring.user.dto.mapper.UserToUserDTOMapper;
 import com.cocoe.spring.user.exception.EmailExistException;
@@ -32,6 +37,7 @@ import com.cocoe.spring.user.exception.RecordNotFoundException;
 import com.cocoe.spring.user.exception.UserNotFoundException;
 import com.cocoe.spring.user.exception.UsernameExistException;
 import com.cocoe.spring.user.model.HttpResponse;
+import com.cocoe.spring.user.model.ShopDetails;
 import com.cocoe.spring.user.model.User;
 import com.cocoe.spring.user.service.UserDetailsService;
 
@@ -43,11 +49,25 @@ public class SellerController {
 	private static final String USER_DELETED_SUCCESSFULLY = "User deleted successfully";
 	@Autowired
 	UserDetailsService userService;
-
+	@Autowired
+	ShopDetailsService shopDetailsService;
 	 public Authentication getAuthentication() {
 	        return SecurityContextHolder.getContext().getAuthentication();
 	    }
 
+	 @PostMapping("/addShopDetails")
+	    public ResponseEntity<UserDTO> addShopDetails(@RequestBody
+	    		ShopDetailsDTO  shopDetails  ) {
+		 shopDetailsService.addShopDetails(ShopDetailsDTOToShopDetailsMapper.convert(shopDetails));
+	        return new ResponseEntity<>( OK);
+	    }
+	 @GetMapping("/getShopDetails")
+	    public ResponseEntity<List<ShopDetailsDTO>> getShopDetails(  ) {	       
+      List<ShopDetails> details=shopDetailsService.getSellers();
+      System.out.println(details);
+	    	return new ResponseEntity<>(ShopDetailsToShopDetailsDTOMapper.convertAll(details) ,OK);
+	    }
+	 
     @PostMapping("/update")
     public ResponseEntity<UserDTO> update(@RequestParam("currentEmail") String currentEmail,
                                        @RequestParam("firstName") String firstName,
